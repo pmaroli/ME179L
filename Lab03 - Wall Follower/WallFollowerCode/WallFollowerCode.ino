@@ -10,7 +10,9 @@ const int longPin = A1;  // Analog input pin that the LONG range sensor is attac
 int sensorValue = 0; //Short range sensor value
 int longValue = 0; //Long range sensor value
 
-int count = 0;
+int countR = 0;
+int countL = 0;
+int countS = 0;
 int diff = 0;
 int maxdiff = 30;
 
@@ -26,7 +28,7 @@ left_motor.setSpeed(255); // Speeds are set differently to compensate for differ
 right_motor.setSpeed(200); 
 }
 
-int setpoint = 300; //Setpoint distance from the wall for the short range sensor
+int setpoint = 415; //Setpoint distance from the wall for the short range sensor
 
 void loop(){ 
 
@@ -45,31 +47,34 @@ void loop(){
   
   diff = sensorValue - setpoint;
 
-  if(longValue > 400) {
-    count++;
-    if(count > 3){
+  if(longValue > 370) {
+    countS++;
+    if(countS > 2){
       right_motor.run(FORWARD);
       left_motor.run(BACKWARD);
-      delay(600);
-      count = 0;
+      delay(750);
+      countR = 0; countL = 0; countS = 0;
       left_motor.run(FORWARD);  
     }
   }else if(diff < maxdiff && diff > -maxdiff){
     left_motor.run(FORWARD);
     right_motor.run(FORWARD);
-  }else if(diff > maxdiff) {
-    count++;
-    if(count > 5){
-      left_motor.run(RELEASE);  
-    }
+    countR = 0; countL = 0;
   }else if(diff < -maxdiff) {
-    count++;
-    if(count > 5){
-      right_motor.run(RELEASE);  
+  countR++;
+    if(countR > 5){
+      right_motor.run(RELEASE); 
+      left_motor.run(FORWARD); 
+    }
+  }else if(diff > maxdiff) {
+    countL++;
+    if(countL > 5){
+      left_motor.run(RELEASE);
+      right_motor.run(FORWARD);  
     }
   }else {
-    count = 0;
+    countR = 0; countL = 0; countS = 0;
   }
 
-  delay(2);
+ // delay(2);
 }
